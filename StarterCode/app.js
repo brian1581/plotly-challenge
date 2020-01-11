@@ -1,41 +1,105 @@
-var jsonFile = 'samples.json';
+var jsonFile = ('samples.json');
 var names;
 var samples;
 var metadata;
 
-function getSampleNames(){
-  var selector = document.getElementById('selDataset');
-  d3.json(jsonFile).then(function(data) {
-    // console.log(data);
-    var names = data.names;
-    var samples = data.samples;
+// function getSampleNames(){
+//   var selector = document.getElementById('selDataset');
+//   d3.json(jsonFile).then(function(data) {
+//     // console.log(data);
+//     var names = data.names;
+//     var samples = data.samples;
+//     var metadata = data.metadata;
+//     // console.log(metadata);
+//       });
+//   };
+
+// getSampleNames();
+
+// function newOption(newSample) {
+//   // var selector = d3.select("#selDataset");
+//   // changeOption(newSample);
+//   metadataUpdate(newSample);
+  // barUpdate(newSample);
+  // bubbleUpdate(newSample);
+// };
+
+function metadataUpdate(sample) {
+  d3.json("samples.json").then((data) => {
     var metadata = data.metadata;
-    // console.log(metadata);
-      });
-  };
+    // Filter the data for the object with the desired sample number
+    var resultArray = metadata.filter(sampleObj => sampleObj.id == sample);
+    var result = resultArray[0];
+    // Use d3 to select the panel with id of `#sample-metadata`
+    var PANEL = d3.select("#sample-metadata");
 
-getSampleNames();
+    // Use `.html("") to clear any existing metadata
+    PANEL.html("");
 
-function changeOption() {
-    // grab the dropdown element
-    var selector = d3.select("#selDataset");
-  
-    // Use the List of Sample Names to Populate the Select Options
-    d3.json(jsonFile).then((data) => {
-        data.names.forEach((sample) => {
-        selector
-          .append("option")
-          .text(sample)
-          .property("value", sample);
-      });
-  
-      // Use the First Sample from the List to Build Initial Plots
-      var sampleOne = data[0];
-      // barUpdate(sampleOne);
-      // bubbleUpdate(sampleOne);
-      metadataUpdate(sampleOne);
+    // Use `Object.entries` to add each key and value pair to the panel
+    // Hint: Inside the loop, you will need to use d3 to append new
+    // tags for each key-value in the metadata.
+    Object.entries(result).forEach(([key, value]) => {
+      PANEL.append("h6").text(`${key.toUpperCase()}: ${value}`);
     });
-  }
+
+  });
+}
+
+
+function init() {
+  // Grab a reference to the dropdown select element
+  var selector = d3.select("#selDataset");
+
+  // Use the list of sample names to populate the select options
+  d3.json("samples.json").then((data) => {
+    var sampleNames = data.names;
+
+    sampleNames.forEach((sample) => {
+      selector
+        .append("option")
+        .text(sample)
+        .property("value", sample);
+    });
+
+    // Use the first sample from the list to build the initial plots
+    var firstSample = sampleNames[0];
+    metadataUpdate(firstSample);
+  });
+}
+
+function optionChanged(sample) {
+  // Fetch new data each time a new sample is selected
+  // buildCharts(newSample);
+  metadataUpdate(sample);
+}
+
+// Initialize the dashboard
+init();
+
+
+
+// function changeOption() {
+//     // grab the dropdown element
+//     var selector = d3.select("#selDataset");
+  
+//     // Use the List of Sample Names to Populate the Select Options
+//     d3.json(jsonFile).then((data) => {
+//         data.names.forEach((sample) => {
+//         selector
+//           .append("option")
+//           .text(sample)
+//           .property("value", sample);
+//       });
+  
+//       // Use the First Sample from the List to Build Initial Plots
+//       var sampleOne = data[0];
+//       // var newSample = data[i];
+//       // barUpdate(sampleOne);
+//       // bubbleUpdate(sampleOne);
+//       metadataUpdate(sampleOne);
+//     });
+//   }
 
 // function changeOption(sample){
 //     var dropDown = d3.select('.selDataset')
@@ -127,4 +191,4 @@ function metadataUpdate(){
 // }
 
 //initialize
-changeOption("940");
+changeOption();
